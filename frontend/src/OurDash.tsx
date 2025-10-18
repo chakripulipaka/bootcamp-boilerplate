@@ -3,6 +3,7 @@ import pets from './examplepets.json'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Card from '@mui/material/Card'
+import { Stack } from '@mui/material';
 
 import CardContent from '@mui/material/CardContent'
 import CardMedia from '@mui/material/CardMedia'
@@ -27,24 +28,34 @@ import { useMemo } from 'react';
 
 function OurDash() {
   const [searchEntry, setSearchEntry] = useState<string>('')
-  const [age, setAge] = useState('');
-  const [breed, setBreed] = useState('');
+  const [age, setAge] = useState("");
+  const [breedChoice, setBreed] = useState("");
+
   //const petsFilte = useMemo(calculateValue, dependencies)
 
   const filtered = useMemo(() => {
-    const q = searchEntry.trim()
-    if (!q) return pets
-    return pets.filter((pet: any) => {
-      const name = String(pet.name || '')
-      const breed = String(pet.breed || '')
+  const q = searchEntry.trim().toLowerCase();
 
-      return name.toLowerCase().includes(q) || breed.includes(q)
-    })
-  }, [pets, searchEntry])
+  return pets.filter((pet: any) => {
+    const name = String(pet.name || "").toLowerCase();
+    const breed = String(pet.breed || "");
+    const petAge = parseInt(pet.age);
 
- const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
-  };
+    const matchesBreed = !breedChoice || breed === breedChoice;
+    const intAgeChoice = parseInt(age);
+    const matchesAge =
+      !age ||
+      petAge === intAgeChoice ||
+      petAge === intAgeChoice + 1 ||
+      petAge === intAgeChoice + 2;
+
+    return name.includes(q) && matchesBreed && matchesAge;
+  });
+}, [searchEntry, breedChoice, age]);
+
+ //const handleChange = (event: SelectChangeEvent) => {
+   // setAge(event.target.value as string);
+  //};
 
   const petCards = filtered.map((pet: any) => { //for local json file: change "data" to "pets" and uncomment the json import line 
     //const petsFilter = pets.filter((pet) => pet.name.includes(searchEntry))
@@ -77,45 +88,79 @@ function OurDash() {
   return (
     <>
       <Container maxWidth="lg">
-        <Box className="dashboard" sx={{py: 4}}>
-          <TextField 
-            value = {searchEntry} 
-            onChange={(event) => setSearchEntry(event.target.value)}
-            id="outlined-basic"
-            label="Search" 
-            variant="outlined" 
-            />
+        
+
+        <Stack
+          direction={'row'}
+          spacing={3}
+
+        >
+
+
+        <Box
+          sx={{
+            width: { sm: 280 }, 
+            //position: { sm: 'sticky' },
+            top: { sm: 16 },    
+          }}
+        >
+          <TextField
+            fullWidth
+            value={searchEntry}
+            onChange={(e) => setSearchEntry(e.target.value)}
+            id="search"
+            label="Search"
+            variant="outlined"
+          />
+
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="age-label">Age</InputLabel>
+            <Select
+              labelId="age-label"
+              id="age-selection"
+              value={age}
+              label="Age"
+              onChange={(e) => setAge(e.target.value)}
+              
+            >
+              <MenuItem value=""> None </MenuItem>
+              <MenuItem value="0">0-3</MenuItem>
+              <MenuItem value="4">4-6</MenuItem>
+              <MenuItem value="7+">7+</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="breed-label">Breed</InputLabel>
+            <Select
+              labelId="breed-label"
+              id="breed-selection"
+              value={breedChoice}
+              label="Breed"
+              onChange={(e) => setBreed(e.target.value)}
+            >
+              <MenuItem value=""> None </MenuItem>
+              <MenuItem value="Poodle">Poodle</MenuItem>
+              <MenuItem value="Golden Retriever">Golden Retriever</MenuItem>
+            </Select>
+          </FormControl>
+
+        </Box>
+            
+          
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+
+          <Typography >Best Matches</Typography>
+
+          <Box sx={{ height: 20 }} />
+
           <div className="pet-grid">
             {petCards}
           </div>
+
         </Box>
-        <FormControl fullWidth>
-            <InputLabel id="age">Age</InputLabel>
-            <Select
-                labelId="Age"
-                id="age-selection"
-                value={age}
-                label="Age"
-                onChange={handleChange}
-            >
-                <option value="0-3">0-3</option>
-                <option value="4-6">4-6</option>
-                <option value="7+">5-7</option>
-            </Select>
-        </FormControl>
-        <FormControl fullWidth>
-            <InputLabel id="breed">Breed</InputLabel>
-            <Select
-                labelId="Breed"
-                id="breed-selection"
-                value={breed}
-                label="Breed"
-                onChange={handleChange}
-            >
-                <option value="Poodle">Poodle</option>
-                <option value="Golden Retriever">Golden Retriever</option>
-            </Select>
-        </FormControl>
+
+        </Stack>
       </Container>
     </>
   )
