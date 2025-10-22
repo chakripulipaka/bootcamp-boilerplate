@@ -41,6 +41,7 @@ function OurDash() {
   const [searchEntry, setSearchEntry] = useState<string>('')
   const [age, setAge] = useState("");
   const [breedChoice, setBreed] = useState("");
+  const [priceRange, setPriceRange] = useState<string>('');
   const [pets, setPets] = useState<any[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string>('')
@@ -309,12 +310,13 @@ function OurDash() {
 
   const filtered = useMemo(() => {
     const q = searchEntry.trim().toLowerCase();
-
+  
     return pets.filter((pet: any) => {
       const name = String(pet.name || "").toLowerCase();
       const breed = String(pet.breed || "");
       const petAge = parseInt(pet.age);
-
+      const cost = parseInt(pet.costRange);
+  
       const matchesBreed = !breedChoice || breed === breedChoice;
       const intAgeChoice = parseInt(age);
       const matchesAge =
@@ -322,11 +324,18 @@ function OurDash() {
         petAge === intAgeChoice ||
         petAge === intAgeChoice + 1 ||
         petAge === intAgeChoice + 2;
-
-      return name.includes(q) && matchesBreed && matchesAge;
+  
+      // New price filtering logic
+      const matchesPrice =
+        !priceRange ||
+        (priceRange === 'low' && cost < 250) ||
+        (priceRange === 'mid' && cost >= 250 && cost <= 750) ||
+        (priceRange === 'high' && cost > 750);
+  
+      return name.includes(q) && matchesBreed && matchesAge && matchesPrice;
     });
-  }, [pets, searchEntry, breedChoice, age]);
-
+  }, [pets, searchEntry, breedChoice, age, priceRange]);
+  
  //const handleChange = (event: SelectChangeEvent) => {
    // setAge(event.target.value as string);
   //};
@@ -477,7 +486,8 @@ function OurDash() {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
+
         
 
         <Stack
@@ -543,8 +553,26 @@ function OurDash() {
               <MenuItem value="Golden Retriever">Golden Retriever</MenuItem>
               <MenuItem value="Labrador Retriever">Labrador Retriever</MenuItem>
               <MenuItem value="Chihuahua">Chihuahua</MenuItem>
+              <MenuItem value="Pomeranian">Pomeranian</MenuItem>
             </Select>
           </FormControl>
+
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel id="price-label">Price Range</InputLabel>
+            <Select
+              labelId="price-label"
+              id="price-selection"
+              value={priceRange}
+              label="Price Range"
+              onChange={(e) => setPriceRange(e.target.value)}
+            >
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value="low">Under $250</MenuItem>
+              <MenuItem value="mid">$250 - $750</MenuItem>
+              <MenuItem value="high">Over $750</MenuItem>
+            </Select>
+          </FormControl>
+
 
         </Box>
             
@@ -816,152 +844,6 @@ function OurDash() {
       </Dialog>
     </>
   )
-  
-    // const pages = ['Products', 'Pricing', 'Blog'];
-    // const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
-    // function ResponsiveAppBar() {
-    // const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-    // const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
-    // const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    //     setAnchorElNav(event.currentTarget);
-    // };
-    // const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    //     setAnchorElUser(event.currentTarget);
-    // };
-
-    // const handleCloseNavMenu = () => {
-    //     setAnchorElNav(null);
-    // };
-
-    // const handleCloseUserMenu = () => {
-    //     setAnchorElUser(null);
-    // };
-
-    // return (
-    //     <AppBar position="static">
-    //     <Container maxWidth="xl">
-    //         <Toolbar disableGutters>
-    //         <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-    //         <Typography
-    //             variant="h6"
-    //             noWrap
-    //             component="a"
-    //             href="#app-bar-with-responsive-menu"
-    //             sx={{
-    //             mr: 2,
-    //             display: { xs: 'none', md: 'flex' },
-    //             fontFamily: 'monospace',
-    //             fontWeight: 700,
-    //             letterSpacing: '.3rem',
-    //             color: 'inherit',
-    //             textDecoration: 'none',
-    //             }}
-    //         >
-    //             LOGO
-    //         </Typography>
-
-    //         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-    //             <IconButton
-    //             size="large"
-    //             aria-label="account of current user"
-    //             aria-controls="menu-appbar"
-    //             aria-haspopup="true"
-    //             onClick={handleOpenNavMenu}
-    //             color="inherit"
-    //             >
-    //             <MenuIcon />
-    //             </IconButton>
-    //             <Menu
-    //             id="menu-appbar"
-    //             anchorEl={anchorElNav}
-    //             anchorOrigin={{
-    //                 vertical: 'bottom',
-    //                 horizontal: 'left',
-    //             }}
-    //             keepMounted
-    //             transformOrigin={{
-    //                 vertical: 'top',
-    //                 horizontal: 'left',
-    //             }}
-    //             open={Boolean(anchorElNav)}
-    //             onClose={handleCloseNavMenu}
-    //             sx={{ display: { xs: 'block', md: 'none' } }}
-    //             >
-    //             {pages.map((page) => (
-    //                 <MenuItem key={page} onClick={handleCloseNavMenu}>
-    //                 <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
-    //                 </MenuItem>
-    //             ))}
-    //             </Menu>
-    //         </Box>
-    //         <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-    //         <Typography
-    //             variant="h5"
-    //             noWrap
-    //             component="a"
-    //             href="#app-bar-with-responsive-menu"
-    //             sx={{
-    //             mr: 2,
-    //             display: { xs: 'flex', md: 'none' },
-    //             flexGrow: 1,
-    //             fontFamily: 'monospace',
-    //             fontWeight: 700,
-    //             letterSpacing: '.3rem',
-    //             color: 'inherit',
-    //             textDecoration: 'none',
-    //             }}
-    //         >
-    //             LOGO
-    //         </Typography>
-    //         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-    //             {pages.map((page) => (
-    //             <Button
-    //                 key={page}
-    //                 onClick={handleCloseNavMenu}
-    //                 sx={{ my: 2, color: 'white', display: 'block' }}
-    //             >
-    //                 {page}
-    //             </Button>
-    //             ))}
-    //         </Box>
-    //         <Box sx={{ flexGrow: 0 }}>
-    //             <Tooltip title="Open settings">
-    //             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-    //                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-    //             </IconButton>
-    //             </Tooltip>
-    //             <Menu
-    //             sx={{ mt: '45px' }}
-    //             id="menu-appbar"
-    //             anchorEl={anchorElUser}
-    //             anchorOrigin={{
-    //                 vertical: 'top',
-    //                 horizontal: 'right',
-    //             }}
-    //             keepMounted
-    //             transformOrigin={{
-    //                 vertical: 'top',
-    //                 horizontal: 'right',
-    //             }}
-    //             open={Boolean(anchorElUser)}
-    //             onClose={handleCloseUserMenu}
-    //             >
-    //             {settings.map((setting) => (
-    //                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-    //                 <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
-    //                 </MenuItem>
-    //             ))}
-    //             </Menu>
-    //         </Box>
-    //         </Toolbar>
-    //     </Container>
-    //     </AppBar>
-    // );
-    // }
-
-
 }
 
 
