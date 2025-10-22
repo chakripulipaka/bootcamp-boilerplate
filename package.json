@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "cd frontend && npm run dev",
     "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
-    "server": "set NODE_ENV=development && node backend/ExampleServer.js"
+    "server": "NODE_ENV=development node backend/ExampleServer.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

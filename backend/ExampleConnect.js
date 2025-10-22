@@ -9,7 +9,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env') })
 const client = new MongoClient(process.env.ATLAS_URI, {
   serverApi: {
     version: ServerApiVersion.v1,
-    strict: true,
+    strict: false,
     deprecationErrors: true,
   }
 });
